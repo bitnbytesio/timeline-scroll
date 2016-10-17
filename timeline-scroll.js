@@ -1,8 +1,8 @@
 /*
  * Timeline Scroll
  * @author: Harcharan Singh <artisangang@gmail.com>
- * @author: Parshant <artisangang@gmail.com>
- * @version 1.3.1
+ * @author: Parshant 
+ * @version 1.0
  * @git: https://github.com/artisangang/timeline-scroll
  */
 

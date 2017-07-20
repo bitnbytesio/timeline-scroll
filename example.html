@@ -94,14 +94,24 @@
       <div class="text-center">
   	   <button id="nxt" class="btn">Next</button>
       </div>
-	<div class="outer">
-		<div class="team">1</div>
-		<div class="team" style="height:400px">2</div>
-		<div class="team" style="height:250px">3</div>
-		<div class="team"  style="height:500px">4</div>
-		<div class="team">5</div>
-		<div class="team">6</div>
-	</div>
+
+      <ul class="timeline-nav" style="float: right; position: fixed; top: 30%; right: 20px; font-size: 15px; font-weight: bold">
+        <li onclick="moveTo(0, this)">Team 1</li>
+        <li onclick="moveTo(1, this)">Team 2</li>
+        <li onclick="moveTo(2, this)">Team 3</li>
+        <li onclick="moveTo(3, this)">Team 4</li>
+        <li onclick="moveTo(4, this)">Team 5</li>
+        <li onclick="moveTo(5, this)">Team 6</li>
+      </ul>
+
+      	<div class="outer">
+      		<div class="team">1</div>
+      		<div class="team" style="height:400px">2</div>
+      		<div class="team" style="height:250px">3</div>
+      		<div class="team"  style="height:500px">4</div>
+      		<div class="team">5</div>
+      		<div class="team">6</div>
+      	</div>
 
 
 	  <h3>Mixed: mobile and desktop</h3>
@@ -173,12 +183,28 @@
 <script type="text/javascript" src="timeline-scroll.js"></script>
 <script type="text/javascript">
 
-$('.outer').timelineScroll({
+var timeline = $('.outer').timelineScroll({
 	button: '#nxt',
 	siblings: '.team',
 	margin: 20,
 	delay:200
 });
+
+function moveTo(index, ele) {
+  timeline.moveTo(index);
+  $('.timeline-nav > li').removeAttr('style');
+  $(ele).css('color', 'green');
+}
+
+document.addEventListener('timelineScroll', function (e) {
+  $('.team').removeAttr('style');
+  $(e.detail.siblingEle).css('background-color', 'red');
+
+  $('.timeline-nav > li').removeAttr('style');
+  $('.timeline-nav > li:eq('+e.detail.currentIndex+')').css('color', 'green');
+
+}, false);
+
 
 </script>
 </body>

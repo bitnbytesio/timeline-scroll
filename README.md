@@ -6,6 +6,6 @@ Create Timeline or Team Scroll
 see example.html
 
 
-# Author
+# Contributors
 
 Parshant <https://github.com/Parshant2111>

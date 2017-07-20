@@ -2,21 +2,18 @@
  * Timeline Scroll
  * @author: Harcharan Singh <artisangang@gmail.com>
  * @author: Parshant 
- * @version 1.0
+ * @version 2
  * @git: https://github.com/artisangang/timeline-scroll
  */
 
 (function($){ 'use strict';
 
-	$.fn.timelineScroll = function (config) {
-
-		var ele = this;
-
-		var currentIndex = 0;
-
-		var animating = false;
-
-		var defaultConfig = {
+	function scrollPlugin(ele, config) {
+		this.ele = ele;
+		this.config = config || {};
+		this.currentIndex = 0;
+		this.animating = false;
+		this.defaultConfig = {
 			button: '#timelineScroll-btn',
 			siblings: '.timelineScroll-item',
 			margin:20,
@@ -24,41 +21,39 @@
 			delay:800
 		};
 
-		 $.extend(defaultConfig, config || {});
-		
-
-		$(defaultConfig.button).click(function () {
-
-			var length = $(defaultConfig.siblings).length - 1;
-
-			if (currentIndex >= length) return;
-
-			animating = true;
-
-			currentIndex++;
-
-			$('html, body').animate({
-	        	scrollTop: $(defaultConfig.siblings + ':eq('+currentIndex+')').offset().top - defaultConfig.margin
-		    }, defaultConfig.delay, function () {
-		    	
-		    	setTimeout(function () {
-		    		animating = false;
-		    	}, defaultConfig.timeout);
-		    	
-		    });
 
 
+		$.extend(this.defaultConfig, this.config || {});
+
+		this.length = $(this.defaultConfig.siblings).length - 1;
+
+		var instance = this;
+
+		$(this.defaultConfig.button).click(function () {	
+			instance.currentIndex++;
+			instance.move(instance.currentIndex);
 		});
-
 
 		$(window).scroll(function () {
 							
-			if (animating == false) {
+			if (instance.animating == false) {
 							
-				$(defaultConfig.siblings).each(function(e){
+				$(instance.defaultConfig.siblings).each(function(e){
+
+					var targetSibling = jQuery(instance.defaultConfig.siblings + ':eq('+e+')');
 					
-					if($(document).scrollTop() > jQuery(defaultConfig.siblings + ':eq('+e+')').offset().top){
-						currentIndex = e;							
+					if($(document).scrollTop() > targetSibling.offset().top){
+						instance.currentIndex = e;		
+
+						var event = new CustomEvent('timelineScroll', { 
+				    		detail :{ 
+				    			type: 'scroll',
+				    			currentIndex: instance.currentIndex,
+				    			siblingEle: targetSibling
+				    			}
+				    		});
+				    	document.dispatchEvent(event);
+
 					} 
 
 				});
@@ -67,7 +62,60 @@
 
 
 		});
+	}
 
+	scrollPlugin.prototype.moveTo = function (index) {
+		this.move(index);
+		this.currentIndex = index;
+	};
+
+	scrollPlugin.prototype.moveNext = function () {			
+		this.currentIndex++;
+		this.move(this.currentIndex);
+	};
+
+	scrollPlugin.prototype.moveBack = function () {		
+		this.currentIndex--;
+		this.move(this.currentIndex);
+	};
+
+	scrollPlugin.prototype.move = function (index) {
+
+		this.length = $(this.defaultConfig.siblings).length - 1;
+
+		if (index > this.length || index < 0) return;
+
+		this.animating = true;
+
+		var targetSibling = $(this.defaultConfig.siblings + ':eq('+index+')');
+
+		var instance = this;
+
+		$('html, body').animate({
+	        	scrollTop: targetSibling.offset().top - instance.defaultConfig.margin
+		    }, instance.defaultConfig.delay, function () {
+
+		    	var event = new CustomEvent('timelineScroll', { 
+		    		detail :{ 
+		    			type: 'move',
+		    			currentIndex: index,
+		    			siblingEle: targetSibling
+		    			}
+		    		});
+		    	document.dispatchEvent(event);
+		    	
+		    	setTimeout(function () {
+		    		instance.animating = false;
+		    	}, instance.defaultConfig.timeout);
+		    	
+		    });
+
+	};
+
+	
+	$.fn.timelineScroll = function (config) {
+
+		return new scrollPlugin(this, config);
 
 
 	};
